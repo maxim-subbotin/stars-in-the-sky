@@ -141,6 +141,11 @@ class StarNode: CircleNode {
     }
 }
 
+enum SkyHemishpere {
+    case north
+    case south
+}
+
 class SkyScene: SKScene {
     private var skyCircle = SKShapeNode(circleOfRadius: 100)
     private var skyRadius = CGFloat(0)
@@ -155,6 +160,17 @@ class SkyScene: SKScene {
     
     private var minZoom = CGFloat(1)
     private var maxZoom = CGFloat(8)
+    
+    private var _hemisphere: SkyHemishpere = .north
+    public var hemisphere: SkyHemishpere {
+        get {
+            return _hemisphere
+        }
+        set {
+            _hemisphere = newValue
+            renderStars()
+        }
+    }
 
     override func sceneDidLoad() {
         super.sceneDidLoad()
@@ -236,15 +252,16 @@ class SkyScene: SKScene {
     }
     
     func renderStars() {
-        for star in catalog.stars {
-            if star.dec == nil || star.rarad == nil {
-                continue
+        for s in self.children {
+            if s is StarNode {
+                s.removeFromParent()
             }
-            
-            if star.dec! < 0 {
-                continue
-            }
-            
+        }
+        
+        let stars = hemisphere == .north ? catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! >= 0.0 }) :
+            catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! <= 0.0 })
+        
+        for star in stars {
             let radius = skyRadius * CGFloat(1.0 - abs(star.dec! / 90))
             let x = skyCenter.x + radius * CGFloat(cos(star.rarad!))
             let y = skyCenter.y + radius * CGFloat(sin(star.rarad!))
