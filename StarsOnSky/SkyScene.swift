@@ -171,6 +171,17 @@ class SkyScene: SKScene {
             renderStars()
         }
     }
+    
+    private var _thresholdMagnitude: Double = 4.0
+    public var thresholdMagnitude: Double {
+        get {
+            return _thresholdMagnitude
+        }
+        set {
+            _thresholdMagnitude = newValue
+            renderStars()
+        }
+    }
 
     override func sceneDidLoad() {
         super.sceneDidLoad()
@@ -181,8 +192,6 @@ class SkyScene: SKScene {
         super.didMove(to: view)
         
         renderSky()
-
-        catalog.load()
         
         renderStars()
         
@@ -258,20 +267,29 @@ class SkyScene: SKScene {
             }
         }
         
-        let stars = hemisphere == .north ? catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! >= 0.0 }) :
-            catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! <= 0.0 })
+        //let stars = hemisphere == .north ? catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! >= 0.0 }) :
+        //    catalog.stars.filter({ $0.dec != nil && $0.rarad != nil && $0.dec! <= 0.0 })
+        
+        let stars = catalog.getStars(brighterThan: thresholdMagnitude, inHemispere: hemisphere)
         
         for star in stars {
             let radius = skyRadius * CGFloat(1.0 - abs(star.dec! / 90))
             let x = skyCenter.x + radius * CGFloat(cos(star.rarad!))
             let y = skyCenter.y + radius * CGFloat(sin(star.rarad!))
             
-            let starSize = (6 - star.mag!) / 2
+            let maxStarSize = CGFloat(6)
+            let k = CGFloat(1.0 - star.mag! * 0.125)
+            
+            let starSize = max(1, maxStarSize * k) / 2
             let starCircle = StarNode(withRightAscention: CGFloat(star.rarad!),
                                       declination: CGFloat(star.decrad!),
                                       radius: CGFloat(starSize),
                                       position: CGPoint(x: x, y: y))
+            
+            let lvl = min(1.0, 1.0 * k)
+            
             starCircle.fillColor = .white
+            starCircle.alpha = lvl
             
             if star.mag! <= 1 {
                 starCircle.glowWidth = CGFloat(starSize)

@@ -6,9 +6,102 @@
 //
 
 import Foundation
+import SQLite3
+
+enum CatalogStatus {
+    case OK
+    case failed
+}
 
 class Catalog {
     public var stars = [Star]()
+    private var dbName = "hyg"
+    private var db: OpaquePointer?
+    private var status = CatalogStatus.failed
+    
+    func connect() -> OpaquePointer? {
+        let dbPath = Bundle.main.path(forResource: dbName, ofType: "sqlite")
+        var db: OpaquePointer?
+        if sqlite3_open(dbPath, &db) == SQLITE_OK {
+            print("HYG db: connection was established")
+            return db
+        }
+        print("HYG db: connection was failed")
+        return nil
+    }
+    
+    init() {
+        db = connect()
+        self.status = db == nil ? .OK : .failed
+    }
+    
+    func getStars(brighterThan b: Double) -> [Star] {
+        let query = "SELECT * FROM stars WHERE mag < \(b) AND id > 1 ORDER BY mag ASC"
+        return execute(query: query)
+    }
+    
+    func getStars(brighterThan b: Double, inHemispere hem: SkyHemishpere) -> [Star] {
+        let query = hem == .north ? "SELECT * FROM stars WHERE mag < \(b) AND dec >= \(0) AND id > 1 ORDER BY mag ASC"
+                                  : "SELECT * FROM stars WHERE mag < \(b) AND dec <= \(0) AND id > 1 ORDER BY mag ASC"
+        return execute(query: query)
+    }
+    
+    func execute(query: String) -> [Star] {
+        var queryStatement: OpaquePointer?
+        var stars = [Star]()
+        if sqlite3_prepare_v2(db, query, -1, &queryStatement, nil) == SQLITE_OK {
+            while sqlite3_step(queryStatement) == SQLITE_ROW {
+                let star = getStar(fromStatement: queryStatement!)
+                stars.append(star)
+            }
+        } else {
+            print("HYG db: query execution was failed")
+        }
+        
+        return stars
+    }
+    
+    func getStar(fromStatement stat: OpaquePointer) -> Star {
+        let star = Star()
+        star.id = Int(sqlite3_column_int(stat, 0))
+        star.hip = Int(sqlite3_column_int(stat, 1))
+        star.hd = Int(sqlite3_column_int(stat, 2))
+        star.hr = Int(sqlite3_column_int(stat, 3))
+        star.gl = String(cString: sqlite3_column_text(stat, 4))
+        star.bf = String(cString: sqlite3_column_text(stat, 5))
+        star.proper = String(cString: sqlite3_column_text(stat, 6))
+        star.ra = sqlite3_column_double(stat, 7)
+        star.dec = sqlite3_column_double(stat, 8)
+        star.dist = sqlite3_column_double(stat, 9)
+        star.pmra = sqlite3_column_double(stat, 10)
+        star.pmdec = sqlite3_column_double(stat, 11)
+        star.rv = sqlite3_column_double(stat, 12)
+        star.mag = sqlite3_column_double(stat, 13)
+        star.absmag = sqlite3_column_double(stat, 14)
+        star.spect = String(cString: sqlite3_column_text(stat, 15))
+        star.ci = sqlite3_column_double(stat, 16)
+        star.x = sqlite3_column_double(stat, 17)
+        star.y = sqlite3_column_double(stat, 18)
+        star.z = sqlite3_column_double(stat, 19)
+        star.vx = sqlite3_column_double(stat, 20)
+        star.vy = sqlite3_column_double(stat, 21)
+        star.vz = sqlite3_column_double(stat, 22)
+        star.rarad = sqlite3_column_double(stat, 23)
+        star.decrad = sqlite3_column_double(stat, 24)
+        star.pmrarad = sqlite3_column_double(stat, 25)
+        star.pmdecrad = sqlite3_column_double(stat, 26)
+        star.bayer = String(cString: sqlite3_column_text(stat, 27))
+        star.flam = Int(sqlite3_column_int(stat, 28))
+        star.con = String(cString: sqlite3_column_text(stat, 29))
+        star.comp = Int(sqlite3_column_int(stat, 30))
+        star.comp_primary = Int(sqlite3_column_int(stat, 31))
+        star.base = String(cString: sqlite3_column_text(stat, 32))
+        star.lum = sqlite3_column_double(stat, 33)
+        star.varType = String(cString: sqlite3_column_text(stat, 34))
+        star.varMin = sqlite3_column_double(stat, 35)
+        star.varMax = sqlite3_column_double(stat, 36)
+        return star
+    }
     
     func load() {
         // stars_with_names     ~150 stars
@@ -117,6 +210,10 @@ class Star {
     public var varType: String?
     public var varMin: Double?
     public var varMax: Double?
+    
+    init() {
+        
+    }
     
     init(withCSVString str: String) {
         let parts = str.components(separatedBy: ",")

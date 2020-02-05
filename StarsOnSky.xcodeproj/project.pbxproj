@@ -18,6 +18,7 @@
 		D60E80D523C40D98000A1D4A /* stars_with_names.csv in Resources */ = {isa = PBXBuildFile; fileRef = D60E80D423C40D98000A1D4A /* stars_with_names.csv */; };
 		D60E80D723C42115000A1D4A /* stars_less_than_4.csv in Resources */ = {isa = PBXBuildFile; fileRef = D60E80D623C42115000A1D4A /* stars_less_than_4.csv */; };
 		D60E80D923C43110000A1D4A /* stars_less_than_5.csv in Resources */ = {isa = PBXBuildFile; fileRef = D60E80D823C43110000A1D4A /* stars_less_than_5.csv */; };
+		D6129ABD23EB55B3006C2B8D /* hyg.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = D6129ABC23EB55B3006C2B8D /* hyg.sqlite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		D60E80D423C40D98000A1D4A /* stars_with_names.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = stars_with_names.csv; sourceTree = "<group>"; };
 		D60E80D623C42115000A1D4A /* stars_less_than_4.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = stars_less_than_4.csv; sourceTree = "<group>"; };
 		D60E80D823C43110000A1D4A /* stars_less_than_5.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = stars_less_than_5.csv; sourceTree = "<group>"; };
+		D6129ABC23EB55B3006C2B8D /* hyg.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = hyg.sqlite; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 		D60E80CF23C3F9F2000A1D4A /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				D6129ABC23EB55B3006C2B8D /* hyg.sqlite */,
 				D60E80D223C3FA26000A1D4A /* Catalog.swift */,
 				D60E80D423C40D98000A1D4A /* stars_with_names.csv */,
 				D60E80D623C42115000A1D4A /* stars_less_than_4.csv */,
@@ -150,6 +153,7 @@
 			files = (
 				D60E80BF23C3EFDD000A1D4A /* Main.storyboard in Resources */,
 				D60E80D723C42115000A1D4A /* stars_less_than_4.csv in Resources */,
+				D6129ABD23EB55B3006C2B8D /* hyg.sqlite in Resources */,
 				D60E80D923C43110000A1D4A /* stars_less_than_5.csv in Resources */,
 				D60E80D523C40D98000A1D4A /* stars_with_names.csv in Resources */,
 				D60E80C123C3EFE0000A1D4A /* Assets.xcassets in Resources */,
